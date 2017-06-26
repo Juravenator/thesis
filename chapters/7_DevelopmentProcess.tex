@@ -1,0 +1,124 @@
+\chapter{Development process}
+Given the size of the TS and the amount of stakeholders in the proposed changes,
+it is important to have a decent planning.
+
+The main objectives are productivity, and making sure developers deliver what is needed most
+at a particular moment.
+
+It also would be nice to have a sensible feedback system to allow the stakeholders
+to have an influence in the evolution of the TS changes, as they will be the
+people who are going to use it.
+
+A modified version of the Scrum method has been used as the development process.
+The modifications are focused on providing compatibility with the other development
+processes in use by other developers.
+Also it has been modified to account for the limited amount of people working on
+one task.
+
+\section{Scrum}
+Scrum is a relatively new way of developing software projects, although it has
+also been used to execute projects not related to development (e.g. construction
+projects).
+
+It focuses on delivering functional requirements prioritized on the value it adds
+to the project as a whole.
+
+It implements a very strict and repetitive development cycle, usually with a
+period of 1 or more weeks. This is called a Sprint. During the beginning of a
+Sprint, a set of functional requirements are chosen as a goal, and must be
+achieved by the end of the Sprint.
+
+An important distinction to make is that the developers themselves drive this
+process. There is no separate person who makes the planning and the set of
+requirements for a Sprint on their behalf.
+This is where Scrum gets efficient, because the developers after all know best
+what is most important and feasible to achieve in one full Sprint.
+
+At the end of a Sprint a set of functional requirements must be met. This means
+that particular set of functionality in the project must work in a sense that
+the end user can use it. This must be proven by a working demo to the
+stakeholders of the project, all of them.
+
+This is also a very important part of Scrum. By demanding the functionality
+must work to such an extend that it would be useful for deployment means there
+is far less opportunity for hidden errors during actual deployment.
+The working demos to all of the stakeholders also provide feedback to
+developers at early stages, unlike other systems where stakeholders only get to
+see the product all the way at the end of the product development and notice the
+developers and stakeholders had some different ideas about functionality.
+
+For more info about Scrum can be found in the book written by one of its inventors,
+Jeff Sutherland\cite{scrumbook}.
+
+\subsection{Kanban}
+Tasks are divided into distinctive and sequential states. Each task must flow
+through each state.
+A change in the task results in that task being reset to the initial state.
+
+The following states were chosen for a task:
+\begin{labeling}{In productionnnn}
+\item [\textbf{Backlog}] This is a list of all the tasks that need to be done.
+They are not part of a Sprint, but are the list of candidate tasks for a Sprint.\\
+\item [\textbf{To do}] Tasks get moved from the backlog to `To do` when they are
+selected to be part of the currently starting Sprint. This list represents the
+set of tasks that need to be competed (i.e. be in the `Done` state) by the end of
+the Sprint.\\
+\item [\textbf{In progress}] When someone is working on a particular task, it is
+moved from `To do` to `In progress`.\\
+\item [\textbf{In review}] A task get put into `In review` when it is considered
+ready for use. At this stage another developer double checks the new functionality.
+The main objective is detecting missing features or a misunderstood implementation of it.\\
+\item [\textbf{Testing}] At this point the code of a task is pushed to the SVN
+repository. The relevant code is then recompiled and tested by a few experts (i.e.
+people who will be using this panel).\\
+\item [\textbf{Done}] After testing is complete, a task is considered `Done` and
+awaits a new software release to be put in `In production`.\\
+\item [\textbf{In production}] Once a new release of the TS is pushed to production
+systems, the appropriate tasks are moved to `In production`. A task in this state
+can be deleted from the point it can be reasonably assumed the relevant features
+are stable.\\
+\end{labeling}
+
+Trello (\url{https://trello.com/}) has been the tool of choice to implement this
+Kanban board (see figure \ref{fig:Kanban}).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{images/Kanban}
+  \caption{Screenshot of the Trello Kanban board used during development}
+  \label{fig:Kanban}
+\end{figure}
+
+\subsection{Workflow}
+The Scrum process has been modified to account for the tiny number of developers.
+
+Every week a list of functional requirements is made, preferably this does not
+encompass any technical goals and thus only contains goals towards end-user
+functionality. These are formed into tasks and get put into the backlog.
+
+This list is then sorted according to urgency and importance (urgency takes
+precedence over importance).
+After sorting, the backlog items are considered to be put into `To do` status up
+until a point the Sprint contains enough tasks.
+
+After the tasks have been done, they are in the `In review` stage. Where they will
+be either reviewed internally or reviewed during the weekly or monthly meetings
+depending on the importance of the feature.
+
+\section{Version Control}
+Apache Subversion (SVN) is used to implement version control with the online
+software source code.
+
+It is accompanied by a web based ticketing system based on Trac (\url{https://trac.edgewall.org/}).
+
+The repository structure follows all common best practices. The `trunk` folder
+contains strictly working and tested code and is used to perform the nightly builds.
+It has a `branches` folder containing any pending bug fixes or added features.
+Branches follow the `username\_foldername\_ticket\#` naming convention.
+The repository also has a `tags` folder, containing working copies of the source
+code that are associated with a specific version (e.g. 2.0.1).
+
+The versioning system uses three numbers to signify major, minor, and patch changes,
+respectively.
+
+This repository can be found at \url{https://svnweb.cern.ch/trac/cactus}

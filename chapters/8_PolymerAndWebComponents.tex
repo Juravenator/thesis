@@ -1,0 +1,307 @@
+\chapter{Polymer}
+Polymer allows a developer to declare new web Components. This is used to generate
+the custom web interfaces.
+
+This chapter describes how Polymer is used and what developers can do with it.
+
+\section{From C++ to Polymer}
+As stated in chapter \ref{Separation of Concerns}, C++ should only be used for
+data generation.
+
+However, to keep compatibility with legacy code, the string buffer
+system is still used. Therefore the interface must be initiated like so:
+(this example is taken from the Flexbox layout example in the Subsystem Supervisor)
+\fvset{frame=single}
+\begin{pyglist}[language=cpp,numbers=left,numbersep=5pt,fontsize=\small]
+#include "subsystem/supervisor/panels/FlexboxLayout.h"
+#include "ajax/PolymerElement.h"
+
+using namespace subsystempanels;
+FlexboxLayout::FlexboxLayout( tsframework::CellAbstractContext* context,
+                              log4cplus::Logger& logger)
+:tsframework::CellPanel(context,logger) {
+  logger_ = log4cplus::Logger::getInstance(logger.getName() +".FlexboxLayout");
+}
+
+void FlexboxLayout::layout(cgicc::Cgicc& cgi) {
+  remove();
+  add(new ajax::PolymerElement("flexbox-layout"));
+}
+\end{pyglist}
+\fvset{frame=none}
+
+There is still a tiny piece of C++ code that renders the initial HTML
+code, at line 13.
+It merely specifies the name of the Web Component that renders the panel interface
+for the Flexbox layout example panel.
+
+\section{From Polymer to C++}
+\label{From Polymer to C++}
+The previous example did not contain any data generation.
+
+In order to add support for a callback, it must be registered like so:
+(this example is taken from the Form example panel in the Subsystem Supervisor)
+\fvset{frame=single}
+\begin{pyglist}[language=cpp,numbers=left,numbersep=5pt,fontsize=\small]
+  #include "subsystem/supervisor/panels/FormExample.h"
+  #include "ajax/PolymerElement.h"
+  #include "ajax/toolbox.h"
+  #include "json/json.h"
+
+  using namespace subsystempanels;
+  FormExample::FormExample( tsframework::CellAbstractContext* context,
+                            log4cplus::Logger& logger)
+  :tsframework::CellPanel(context,logger) {
+    logger_ = log4cplus::Logger::getInstance(logger.getName() +".FormExample");
+  }
+  FormExample::~FormExample() {
+    remove();
+  }
+
+  void FormExample::layout(cgicc::Cgicc& cgi) {
+    remove();
+    setEvent("submit", ajax::Eventable::OnClick, this, &FormExample::submit);
+    add(new ajax::PolymerElement("form-example"));
+  }
+
+  void FormExample::submit(cgicc::Cgicc& cgi,std::ostream& out) {
+    std::map<std::string,std::string> values(
+      ajax::toolbox::getSubmittedValues(cgi)
+    );
+
+    Json::Value root(Json::arrayValue);
+
+    for(
+      std::map<std::string,std::string>::iterator i(values.begin());
+      i != values.end(); ++i
+    ) {
+      Json::Value someresult;
+      someresult["name"] = i->first;
+      someresult["value"] = i->second;
+      root.append(someresult);
+    }
+
+    out << root;
+  }
+\end{pyglist}
+\fvset{frame=none}
+
+Now a callback `submit` is registered, which will execute the FormExample::submit
+function and return whatever output it generated.
+
+These callbacks can be implemented in Polymer using the `ts-ajax` or the `auto-update`
+element in the `common-elements` package.
+
+\fvset{frame=single}
+\begin{pyglist}[language=html,numbers=left,numbersep=5pt,fontsize=\small]
+<dom-module id="form-example" >
+  <template>
+
+    <ts-ajax id="ajax"
+             callback="submit"
+             data="{{response}}"
+             parameters='["sometextinput"]'
+             sometextinput={{text1}}></ts-ajax>
+    <paper-input label="some text input"
+                 value="{{text1}}" ></paper-input>
+
+    <paper-fab icon="send" title="send" on-click="submit" ></paper-fab>
+
+    <h1>server response:</h1>
+
+    <template is="dom-repeat" items="[[response]]" as="item" >
+      <p>[[item.name]] = [[item.value]]</p>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+        is: 'form-example',
+
+        properties: {
+          response: {
+            type: String,
+            value: undefined
+          }
+        },
+
+        submit: function() {
+          this.$.ajax.generateRequest();
+        }
+    });
+  </script>
+</dom-module>
+\end{pyglist}
+\fvset{frame=none}
+
+\section{Polymer features}
+Polymer is bundled with a lot of useful functionality out of the box.
+The most used ones in this project are described here.
+
+A more detailed explanation can be found at the Polymer docs\cite{polymerdocs}
+\subsection{Properties}
+Polymer elements can contain custom properties defined by the developer.
+A property can be an object, a date, a string, a number, an array, a boolean, or a function.
+They can be configured to be read-only, to spawn events and/or execute functions
+when their value changes.
+
+Properties are useful to display to, or get data from, the user.
+\subsection{Data binding}
+Data binding is used to connect properties between web components or to bind a
+property to a control like an input box or a button value.
+
+It is also useful to automatically fetch data from the server and put it in the
+interface without much effort. An example of this can be found in chapter \ref{From Polymer to C++}.
+\subsection{Lifecycle callbacks}
+A web component can react to lifecycle events. This allows a developer to write
+code to be executed when a new instance of the web component is created, or
+when it is placed inside the DOM tree, or removed from it.
+
+A useful example is the `auto-update` element, which declares an interval on the
+`attached` event, and removes it on the `detached` event.
+\subsection{Styling}
+AjaXell provides developers with a theme. This is provided in the form of a
+web component called `reset-css`. It makes other web components conform to the
+AjaXell them (e.g. button size, fonts, colors, \ldots).
+
+Also Polymer gives developers the possibility to use CSS functionality that is
+not yet implemented in all browsers, but which are very useful for web components.
+
+One of them is CSS variables and mixins, which allows a developer to define variables in CSS.
+Notable is that these variables are inherited just like normal properties.
+This is how the AjaXell theme file defines its theme colors.
+\fvset{frame=single}
+\begin{pyglist}[language=css,numbers=left,numbersep=5pt,fontsize=\small]
+:root {
+  --primary-color: #00671a;
+  --warning-color: yellow;
+  --text-color: black;
+  --fancy-gradient: {
+    background: linear-gradient(to bottom,
+                                #1e5799 0%,
+                                #2989d8 50%,
+                                #207cca 51%,
+                                #7db9e8 100%);
+  }
+}
+paper-button {
+  color:var(--text-color);
+  --paper-button-ink-color:var(--primary-color);
+}
+paper-button.warning {
+  --paper-button-ink-color:var(--warning-color);
+}
+div[fancy] {
+  @apply(--fancy-gradient);
+}
+\end{pyglist}
+\fvset{frame=none}
+
+A Polymer element can include this theme by including it in its template.
+\fvset{frame=single}
+\begin{pyglist}[language=html,numbers=left,numbersep=5pt,fontsize=\small]
+<link rel="import" href="/ts/common-elements/reset-css/reset-css.html" >
+<dom-module id="my-element" >
+  <template>
+    <style include="reset-css" ></style>
+    <paper-button>I am themed!</paper-button>
+  </template>
+  <script>Polymer({is: 'my-element'});</script>
+</dom-module>
+\end{pyglist}
+\fvset{frame=none}
+
+\subsection{Events}
+An element can define define events. It can also react to any event spawned by
+elements in its template using the following syntax:
+
+\fvset{frame=single}
+\begin{pyglist}[language=html,numbers=left,numbersep=5pt,fontsize=\small]
+<dom-module id="my-element" >
+  <template>
+    <!-- paper-button fires 'click' event -->
+    <paper-button on-click="clicked" >Click me!</paper-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'my-element',
+      clicked: function(e, detail) {
+        this.fire('kick', {kicked: true});
+      }
+    });
+  </script>
+</dom-module>
+<my-element></my-element>
+<script>
+  document.querySelector('my-element').addEventListener('kick', function (e) {
+    if (e.detail.kicked) {
+      console.log("kick event fired");
+    };
+  });
+</script>
+\end{pyglist}
+\fvset{frame=none}
+
+\subsection{Behaviors}
+Behaviors in Polymer is a way to share JavaScript code among multiple elements.
+A useful example of this is the `throws-toast` behavior in common-elements,
+which allows an element to show notifications to the user.
+
+The throws-toast.html behavior definition looks like this:
+\fvset{frame=single}
+\begin{pyglist}[language=html,numbers=left,numbersep=5pt,fontsize=\small]
+<script>
+throwsToast = {
+  /**
+   * Throw a message to the central toaster.
+   * The `Toast` object accepts the following properties:<br>
+   * type (String): Can be 'info', 'warning', or 'error'.<br>
+   * message (String | HTMLElement): The actual message to show.<br>
+   * options (Array of Strings) (optional): This will force the user
+   * to stop what they're doing and choose one of the supplied
+   * options. The chosen option is returned.
+   *
+   * @param {Toast} toast Can be 'info', 'warning', or 'error'.
+   * @param {function} callback The function to invoke when one of
+   * the options has been clicked.
+   * Takes the option string as argument.
+   * @return {Void | String}
+   */
+  throwToast: function(toast) {
+    if (typeof toaster === "undefined") {
+      console.error(this, "toaster is undefined");
+    } else {
+      toaster.throwToast(toast, this);
+    }
+  }
+};
+</script>
+\end{pyglist}
+\fvset{frame=none}
+
+An element can implement it like this:
+\fvset{frame=single}
+\begin{pyglist}[language=html,numbers=left,numbersep=5pt,fontsize=\small]
+<link rel="import" href="/ts/ajaxell/html/elements/ag-toaster/throws-toast.html" >
+<dom-module id="notifications-demo" >
+  <template>
+    <paper-button warning on-click="showWarning" >show warning</paper-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'notifications-demo',
+      behaviors: [throwsToast],
+      showWarning: function showWarning() {
+        this.throwToast({
+            'type': 'warning',
+            'message': 'this is a warning at t=' + new Date().getTime(),
+            'callback': function callback(response) {
+                console.log("callback successfull: ", response);
+            }
+        });
+      },
+    });
+  </script>
+</dom-module>
+\end{pyglist}
+\fvset{frame=none}

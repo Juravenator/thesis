@@ -1,0 +1,12 @@
+// this function tests if the Polymer element has declared an object
+// `someObject` and it has a property `name` with value `deinonychus`
+test('defines the "author" property', function() {
+    assert.equal(element.someObject.name, 'deinonychus');
+});
+// tests if the function `sayHello()` returns a specific string.
+// also tests if the function `sayHello()` respects its arguments.
+test('says hello', function() {
+    assert.equal(element.sayHello(), 'template-element says, Hello World!');
+    var greetings = element.sayHello('greetings Earthlings');
+    assert.equal(greetings, 'template-element says, greetings Earthlings');
+});

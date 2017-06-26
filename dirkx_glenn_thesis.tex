@@ -1,0 +1,194 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+% LaTeX, FIIW thesis template                                          %
+% 28/11/2014 v1.2                                                      %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \documentclass[11pt,a4paper]{report}
+% Indien je je thesis recto-verso wil afdrukken gebruik je onderstaande opties i.p.v. bovenstaande
+\documentclass[11pt,a4paper,twoside,openright]{report}
+
+\usepackage[a4paper,left=3.5cm, right=2.5cm, top=3.5cm, bottom=3.5cm]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.12}
+% \usepgfplotslibrary{external}
+% \tikzexternalize
+% \usepackage[latin1]{inputenc}           % om niet ascii karakters rechtstreeks te kunnen inputten
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}            % commentarieer deze regel uit als je utf8 encoded files gebruikt in plaats van latin1
+\usepackage[square,sort,comma,numbers]{natbib}
+\usepackage{scrextend}
+\usepackage{listings}             		% voor het weergeven van broncode
+
+\usepackage{verbatim}					% weergeven van code, commando's, ...
+\usepackage[hyphens]{url}
+\usepackage{hyperref}					% maak PDF van de thesis navigeerbaar
+% \usepackage{url}						% URL's invoegen in tekst met behulp van \url{http://}
+\usepackage[small,bf,hang]{caption}     % om de captions wat te verbeteren
+\usepackage[final]{pdfpages}            % gebruikt voor het invoegen van het artikel in pdf-formaat
+\usepackage{pslatex}					% andere lettertype's dan de standaard types
+
+\usepackage{sectsty}					% aanpassen van de fonts van sections en chapters
+\allsectionsfont{\sffamily}
+\chapterfont{\raggedleft\sffamily}
+
+\usepackage{float}                      % De optie H voor de plaatsing van figuren op de plaats waar je ze invoegt. bvb. \begin{figure}[H]
+\usepackage{longtable}					% tabellen die over meerdere pagina's gespreid worden
+% \usepackage[times]{quotchap}           % indien je fancy hoofdstuktitels wil
+\usepackage[none]{hyphenat}
+%\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{siunitx}
+
+\usepackage{fiiw_geel_eng}
+\usepackage{verbments}
+\usepackage{mhchem}
+\usepackage{gensymb}
+% \usepackage{refcheck}
+
+%door onderstaande regels in commentaar te zetten, of op false, kan je pagina's weglaten
+%bijvoorbeeld het weglaten van een voorwoord, lijst met symbolen, ...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%voorwoord toevoegen?
+\acknowledgementspagetrue
+\acknowledgements{preface/acknowledgements}			%.tex file met daarin het voorwoord
+%abstract toevoegen?
+\abstractpagetrue
+\abstracts{preface/abstract}					%.tex file met daarin het abstract
+%lijst van figuren toevoegen?
+\listoffigurespagetrue
+%lijst van tabellen toevoegen?
+\listoftablespagetrue
+%lijst van symbolen toevoegen?
+\listofsymbolspagetrue
+\listofsymbols{preface/symbols}				%.tex file met daarin de lijst van symbolen
+
+
+
+%informatie over het eindwerk, de promotor, ...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\opleiding{Master of Science in Electronics Engineering}
+\afdeling{Internet Computing}
+
+\title{Upgrading the Interface and Developer Tools of the Trigger Supervisor Software Framework of the CMS experiment at CERN}
+\subtitle{}
+% \author{naam student}
+\forename{Glenn}
+\surname{Dirkx}
+\academicyear{2015 - 2016}
+
+% \promotorA[Promotor]{Peter Karsmakers}
+% \promotorB[Co-promotor]{Christos Lazaridis}
+\promotorA[Supervisor]{Peter Karsmakers}
+\promotorB[Co-supervisor]{Christos Lazaridis}
+\begin{document}
+% \selectlanguage{dutch}
+\selectlanguage{english} % For the english version
+
+\preface
+% % \pagenumbering{gobble}
+% \pagenumbering{roman}
+% \titlep
+%
+% \ifacknowledgementspage
+%   \chapter*{Acknowledgements} \@acknowledgementsfile
+% \fi
+%
+% \ifabstractpage
+%   \chapter*{Abstract} \@abstractfile
+% \fi
+%
+% \tableofcontents
+%
+% \iflistoffigurespage
+%   \listoffigures
+% \fi
+%
+% \iflistoftablespage
+%   \listoftables
+% \fi
+%
+% \iflistofsymbolspage
+%   % \chapter*{List of Symbols}
+%   \@listofsymbolsfile
+% \fi
+%
+% \cleardoublepage
+% % \pagenumbering{gobble}
+% \pagenumbering{arabic}
+
+% \newcommand*{\blankpage}{%
+% \vspace*{\fill}
+% \centering This page would be intentionally left blank if we would not wish to inform about that.
+% \vspace{\fill}}
+% \makeatletter
+% \renewcommand*{\cleardoublepage}{\clearpage\if@twoside \ifodd\c@page\else
+% \blankpage
+% \thispagestyle{empty}
+% \newpage
+% \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+% \makeatother
+
+
+\input{chapters/1_aboutCMS}
+\input{chapters/2_theTS}
+\input{chapters/3_ProblemsWithTS2.0}
+\input{chapters/4_TS3.0Requirements}
+\input{chapters/5_TSUpgradeOptions}
+\input{chapters/6_TSUpgradeRoadmap}
+\input{chapters/7_DevelopmentProcess}
+\input{chapters/8_PolymerAndWebComponents}
+\input{chapters/9_TheRenewedPanelSDK}
+\input{chapters/10_Documentation}
+\input{chapters/11_Testing}
+\input{chapters/12_Results}
+\input{chapters/13_Future}
+\input{chapters/14_Conclusion}
+
+% Bibliografie: referenties. De items zitten in bibliografie.bib
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Indien je ook de niet geciteerde werken in je bibliografie wil opnemen, commentarieer dan onderstaande regel uit!
+%\nocite{*}
+% \bibliographystyle{apalike}
+% \nocite{*}
+\bibliographystyle{IEEEtran}
+\bibliography{chapters/bibliografie}
+
+% Eventueel enkele appendices
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+% \input{attachments/bijlage1}
+
+% Bijlage met daarin het wetenschappelijk artikel
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \chapter{CMS TS Project}
+% \includepdf[pages={1-}]{attachments/2005cms_ts_project_nss.pdf}
+
+% Bijlage met daarin de poster
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \chapter{Poster}
+%\includepdf{poster.pdf}
+
+\chapter{Sphinx Documentation}
+\label{appendix_sphinx}
+Most part of the documentation of this project is auto-generated.
+The manual documentation, developed in Sphinx (described in chapter \ref{Sphinx}),
+is enclosed as an appendix to this document.
+\cleardoublepage
+\includepdf[pages={1-}]{TS_Documentation.pdf}
+
+\chapter{Paper}
+As part of this master thesis it was required to write a paper on the subject.
+A copy of this paper is enclosed as an appendix in this document.
+\cleardoublepage
+\includepdf[pages={1-}]{dirkx_glenn_paper.pdf}
+
+% \includepdf{back_fiiw_geel.pdf}
+\includepdf{covers/back_fiiw_geel_eng.pdf} % For the english version
+
+\end{document}

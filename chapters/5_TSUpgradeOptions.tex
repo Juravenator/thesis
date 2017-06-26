@@ -1,0 +1,319 @@
+\chapter{TS upgrade options}
+Now that there is a firm grasp of the current state of the software and its
+upgrade requirements is achieved, an assessment of the viability of some upgrade options can be performed.
+
+\section{Server-side interface engine}
+Old code must run under the new system. Therefore non-backwards
+compatible modifications to the C++ code are not possible.
+
+The only options are to extend the amount of C++ classes to represent new
+functionality.
+There is no restriction in the sense that the old classes have to remain in use.
+Therefore it is possible to change the way the interface is programmed
+server-side in function of how extensive the additions to the C++ code are.
+
+\section{Client-side interface library}
+At client-side the available options are much more extensive.
+The old Dojo library can be kept, and any new front-end library can be
+added provided this new library does not interfere with the functionality of the
+Dojo library.
+
+Note must be taken however that if any of these new libraries try to dictate the
+flow of the web interface, it must allow us to alter it to adjust to the page
+flow that was used by the old codebase.
+
+\subsection{Upgrading Dojo}
+Currently the used Dojo version is v0.4. It would seem logical to just upgrade
+the front-end library to the latest Dojo version, adjust the appropriate C++
+classes, and create new ones for the added functionality resulting from the upgrade.
+There are however a few problems with this approach.
+
+Firstly, starting from Dojo v0.9, there has been a major Dojo API rewrite.
+This would mean an extensive rewrite of the existing C++ classes is needed, which
+provides for a very high risk of compatibility problems with legacy panels as
+they might anticipate some hacky combination of legacy code that would now have
+dissapeared.
+
+Secondly, it would not have solved any of the problems described in chapter \ref{Problems with TS 2.0},
+except for the browser compatibility problem.
+
+\subsubsection{Running multiple versions of Dojo}
+Running Dojo v0.4 and v0.9 in parallel is also not possible. There is obvious
+overlap of code and running these in parallel essentially means entirely
+refactoring one of the versions, which is undesirable as it is not maintained
+by us and thus not up to us to perform major modifications to.
+
+However, if possible, it would provide easy migration of legacy code as is would
+probably mean a panel developer would just have to specify wether to use the new
+codebase or not.
+
+\subsubsection{Dojo 2.0}
+Currently the latest version of Dojo is v1.10. However the Dojo community is
+finalising version 2.0. This release, as the version suggests, brings vast
+modifications to the library.
+
+This version is to be released during spring 2016, which is about a year too late
+for us to consider. The development started in June 2015 and is expected to be
+finished before spring 2016. Currently Dojo 2.0 is not stable enough to be
+considered.
+
+If the software would be upgraded to use Dojo 1.10 now, the new TS would be stuck on an outdated
+version of Dojo again only months after its release, and no progress will have
+been made.
+The community would migrate to Dojo v2.0 while the TS stays behind and face all the
+current problems all over again.
+
+\subsubsection{Browser compatibility}
+Dojo v1.10 claims the following browser compatibility:
+\begin{itemize}[noitemsep]
+\item Firefox 3.6-20
+\item Safari 5-6
+\item Chrome 13-26
+\item IE 8-10
+\item Opera 10.50-12 (Dojo core only)
+\end{itemize}
+This nicely covers and extends the minimum requirements.
+
+\subsection{jQuery}
+One of the initial ideas was to replace Dojo with a library like jQuery or Zepto,
+accompanied by a CSS framework like bootstrap, foundation, semantic-ui, susy,
+material ui, gumby, Yahoo Pure, or UIKit.
+
+This is a very low-level approach, and for this reason it is actually the safest
+to ensure compatibility with Dojo 0.4.
+
+However, this approach does not have much more than that to offer.
+It is not a framework, it is a collection of helper classes and functions.
+Because it is not a framework, advanced functionality will either be implemented
+by heavy code duplication or by an in-house developed library.
+
+This will lengthen the initial development time and will also mean longer
+development times for interface developers.
+
+This solution will not leverage the interface developers like a proper
+front-end framework will be able to. However, being the most safe option
+in terms of compatibility, this presents a safe back-up option if other options
+end up being incompatible with current needs.
+
+\subsubsection{Compatibility with Dojo}
+Zepto and jQuery functions are fully contained within the `\$` namespace.
+This guarantees the absence of any code overlap with Dojo.
+
+The CSS framework however can still present some problems. Both will try to
+style common elements like buttons and links, and a decision will have to be
+made in how to approach this overlap.
+\subsubsection{Browser compatibility}
+jQuery combined with the most compatible CSS library (Bootstrap) yields the
+following browser support:
+\begin{itemize}[noitemsep]
+\item Firefox (2 latest versions)
+\item Safari 7
+\item Chrome (2 latest versions)
+\item IE 9
+\end{itemize}
+Note the `last 2 versions` support for Firefox. This could present problems
+depending on the age of the used Firefox browser. However this list enumerates
+browsers that have been tested, and since Firefox is generally a `good citizen`
+in the world of web browsers it can be assumed this will present no problems. The
+fact that IE9 is supported strengthens this assumption.
+
+\subsection{AngularJS}
+Angular.js is the most popular front-end web application design framework these
+days. It is very powerful and has an extensive developer community.
+
+It is however not very agnostic about how to design a web app. It makes
+assumptions, and this could make integrating this with Dojo problematic.
+
+
+\subsubsection{Learning curve}
+Angular.js is very powerful, but this power is accompanied by a rather steep
+learning curve\cite{angular_learningcurve} that would make it difficult for people who are not full-time
+web application developers to develop panels for the TS.
+
+Among these problems are confusing terminology (e.g. things called `constructors`
+that are not constructors), function parameter based dependency injections that
+make break minification tools and introduce unnecessary complexity, and an
+unclear scoping of variables.
+
+Giving that the developers of panels are not programming experts, the learning
+curve must not be too high, it will greatly increase the required development
+time to create custom interface panels.
+
+\subsubsection{Running Angular concurrently with Dojo}
+Angular 1.x makes the assumption it has complete control over the layout and the
+flow of the web application. This will give some issues with the  C++ interface
+building logic when building advanced interfaces.
+The C++ code is in control of the application. It constructs the page piece by
+piece as instructed by the developer and is then to be rendered by the front-end
+framework.
+
+\subsubsection{Angular 2.0}
+Angular 2 is much more modular, and has a structure quite agnostic and usable to
+combine with other frameworks.
+
+Implementing Angular 2.0 seems very viable. Unfortunately it is currently still
+in beta status. And while the basics are stable, advanced functionality is still
+being debated and developed. This unfortunately limits the use cases for
+advanced interfaces for the foreseeable future.
+
+Angular 2 Beta could now be implemented while the final release is awaited, but time
+constraints make this an uncomfortable decision to make.
+
+\subsubsection{Browser compatibility}
+Angular 2 claims the following browser compatibility:
+\begin{itemize}[noitemsep]
+\item Firefox (latest development build)
+\item Safari 7
+\item Chrome (latest development build)
+\item IE 9
+\end{itemize}
+Firefox (latest development build) looks troubling. Further testing shows that
+Angular 2 does not work properly in Firefox version <38.
+
+This is very bad, the minimum supported version requirement is v24, 14 versions
+lower. Most SLC installations have Firefox 38 installed, so this could be
+workable. However, this is the only option that will not pass the minimum
+browser support requirements.
+
+\subsection{Web Components}
+Web Components\cite{WebComponentsW3C}\cite{WebcomponentsMozilla} are additions to the HTML5 standard. They
+enable a developer to develop custom HTML tags, the idea is to mitigate the
+`div soup` problem\cite{DivSoup} where the web application's source code increases
+exponentially in size as the complexity of the app increases.
+
+This standardizes an approach seen in many modern JavaScript frameworks such as
+AngularJS (version 2 in particular), Ember.js, Knockout.js, Dojo, and Backbone.js.
+These all allow a developer to declare new `elements` in order to make developing a
+smart web application easier.
+
+However, Web Components are a standardized approach to accomplish this. This
+means that developers no longer have to worry about major API rewrites like the ones encountered
+with Dojo.
+
+Furthermore, a vanilla Web Component is guaranteed to be completely compatible
+with any front-end library. A Web Component is in essence and extra HTML tag
+and is indistinguishable from a `normal` HTML tag to a front-end framework.
+
+Web Components consist of the following standards:
+\begin{labeling}{Custom Elements}
+\item [Custom Elements] This standard allows developers to define their own
+HTML elements.
+\item [HTML Imports] This standard provides a way to import an HTML document,
+much like JavaScript and CSS files are currently imported.
+\item [Templates] This standard defines `HTML Templates` and allows HTML code to
+be reused as needed.
+\item [Shadow DOM] This standard provides a way to have multiple independent
+HTML DOM trees inside one hierarchy by providing a `shadow root`.
+\end{labeling}
+
+\subsubsection{Polymer}
+Polymer is a relatively new library, built directly on the Web Components
+standards, developed by Google. It represents the way Google thinks Web
+Components should be used.
+
+It is very similar to Angular 2 in most respects. For example, they share the
+same data binding syntax.
+
+The reason Polymer is very useful is that it has the potential
+to allow us to introduce proper Separation of Concerns (SoC) principles
+(see chapter \ref{Separation of Concerns}) to the development environment.
+
+\subsubsection{Browser compatibility}
+Web Components are a relatively new set of standards and are currently only
+supported by Google Chrome.
+
+However, the webcomponents.js project (\url{https://github.com/webcomponents/webcomponentsjs})
+aims to polyfill the Web Components standards.
+
+Using this polyfill, browser support can be extended to the following list:
+\begin{itemize}[noitemsep]
+\item Firefox (latest stable build)
+\item Safari 7
+\item Chrome (latest stable build)
+\item IE 10
+\end{itemize}
+This list is very similar to Angular 2's compatibility list. However, testing
+now concludes that support by Mozilla Firefox goes back all the way to v24, our
+minimum requirement.
+
+Note that this means that Polymer has better browser support than Angular 2.
+This is curious, as Polymer uses more recent technologies than Angular 2.
+
+\subsubsection{Running Polymer concurrently with Dojo}
+In a browser with native Web Components support (i.e. the
+webcomponents.js polyfill is not needed), it is guaranteed to have no conflicts between Dojo
+and Polymer. This is because Polymer merely adds extras to the Web Components
+standards and is all contained in the `Polymer()` JavaScript function.
+
+The webcomponents.js polyfill should also not present conflicts, as most of these
+polyfills are transparent.
+The polyfill defines the `document.registerElement()` function if it doesn't exist,
+manually imports HTML Imports if the browser does not support it natively,
+manually stamps `template` elements, and defines the `element.createShadowRoot()`
+with an approximation to the Shadow DOM spec, called `Shady DOM`, if it doesn't exist \\
+(\url{https://www.polymer-project.org/1.0/articles/shadydom.html}).
+
+Some quick tests with Firefox v24 confirms that these JavaScript libraries do
+not present any conflict whatsoever with the Dojo library.
+
+Another possible advantage is that this will probably encounter very little
+problems with CSS code. As every common HTML element like buttons and links are
+replaced in Polymer with a more powerful Web Component version (e.g. <paper-button>
+as a replacement to <input type="button" />).
+
+\subsection{React.js}
+React is a JavaScript library, designed by Facebook Inc., that uses a `virtual DOM`
+system to abstract away complexity from developers when creating interfaces.
+
+It tries to achieve the same goals as the Web Components standards, however it
+does not follow these standards but uses custom technologies. For example it
+uses JSX to define templates rather than the HTML Templates standard.
+
+It has the ability to render server-side and client-side.
+Server-side rendering is great for web-apps that need good SEO (Search Engine
+Optimization), however the TS is an internal app. Also this would mean big
+changes in the server-side code need to be made.
+
+React is an open-source project, but it has a questionable license.
+
+\section{Chosen upgrade path}
+\subsection{Front-end library}
+Things were very close between Angular 2 and Polymer.
+They are both the most powerful tools available for front-end interface building
+today.
+
+Angular 2 inherits its reputation of robustness, stability, and enterprise-level
+code from its predecessor, Angular 1.x.
+
+Polymer has the advantage of being essentially a small `sugaring` layer over
+an established W3C standard. This gives us the advantage of robustness against
+changes as time advances.
+Also the backwards compatibility with older browser versions is more extensive
+with Polymer and the webcomponents.js polyfill than with Angular 2.
+
+The agnostic nature of Polymer will also make future updates easier. As
+compatibility concerns will be less of an issue.
+
+Seeing that Angular 2 and Polymer try to solve the same problems and share some
+code syntax, combined with the fact that Polymer is the more standardized of the
+two and Polymer being the more compatible of the two has led to the conclusion
+that Polymer is the optimal choice for this project.
+
+React is a notable contender. But the lack of using standards and the custom
+license are big drawbacks.
+
+\subsection{Back-end C++ codebase}
+The current approach of designing interfaces can be adapted to support the
+Separation of Concerns (SoC) principles (see chapter \ref{Separation of Concerns}).
+
+The C++ code will no longer be in charge of defining interface layout, it will
+focus and be enhanced for data generation.
+The interface will be rendered on client-side using Web Components and its
+templates.
+Since the main job of XDAQ is Data Acquisition and not interface generation this
+change of architecture seems suitable.
+
+Existing C++ code will be kept and parts of it can be enhanced to render a web
+component rather than Dojo code when that Dojo code has stopped working, like
+the Dojo modal dialog (see figure \ref{fig:ff38} and \ref{fig:ff44} in chapter
+\ref{Interface degradation}).
